@@ -2,7 +2,7 @@
 
 import { Zap, ShieldCheck, Smartphone, Truck, ChevronRight, Star, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion, useScroll, useTransform, Variants } from "framer-motion"
 import ProductCard from "@/components/ProductCard"
 import CartDrawer from "@/components/CartDrawer"
 
@@ -11,12 +11,12 @@ type AnimatedLandingProps = {
   featuredProducts: any[]
 }
 
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 }
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
