@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { createProduct } from "./actions"
-import { Wand2, Loader2 } from "lucide-react"
+import { Wand2, Loader2, UploadCloud } from "lucide-react"
+import { supabase } from "@/lib/supabaseClient"
 
 type Category = {
   id: string
@@ -12,6 +13,7 @@ type Category = {
 export default function ProductForm({ categories }: { categories: Category[] }) {
   const [url, setUrl] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -43,6 +45,35 @@ export default function ProductForm({ categories }: { categories: Category[] }) 
       alert("Error de conexión al intentar importar.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('products')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      const { data } = supabase.storage.from('products').getPublicUrl(filePath)
+      
+      setFormData({ ...formData, image: data.publicUrl })
+    } catch (error: any) {
+      console.error("Error uploading image:", error)
+      alert("Error al subir la imagen: " + error.message)
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -130,18 +161,44 @@ export default function ProductForm({ categories }: { categories: Category[] }) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="image" className="text-sm font-medium">URL de la Imagen Principal</label>
-          <input 
-            type="url" 
-            id="image" 
-            name="image" 
-            required 
-            className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-transparent px-4 py-2" 
-            placeholder="https://..."
-            value={formData.image}
-            onChange={(e) => setFormData({...formData, image: e.target.value})}
-          />
-          <p className="text-xs text-neutral-500">Copia la dirección de la imagen de tu proveedor o usa el Importador Mágico.</p>
+          <label htmlFor="image" className="text-sm font-medium">Imagen del Producto</label>
+          <div className="flex gap-4 items-start">
+            <div className="flex-1 space-y-2">
+              <input 
+                type="url" 
+                id="image" 
+                name="image" 
+                required 
+                className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-transparent px-4 py-2" 
+                placeholder="https://..."
+                value={formData.image}
+                onChange={(e) => setFormData({...formData, image: e.target.value})}
+              />
+              <p className="text-xs text-neutral-500">Pega una URL o sube una imagen desde tu computadora.</p>
+            </div>
+            
+            <div className="relative">
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={isUploading}
+              />
+              <button 
+                type="button"
+                className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
+                {isUploading ? "Subiendo..." : "Subir Foto"}
+              </button>
+            </div>
+          </div>
+          {formData.image && (
+            <div className="mt-4 p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg inline-block bg-white dark:bg-neutral-900">
+              <img src={formData.image} alt="Preview" className="h-32 object-contain rounded" />
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
