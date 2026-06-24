@@ -206,24 +206,6 @@ export default function AnimatedLanding({ featuredProducts }: AnimatedLandingPro
         </div>
       </section>
 
-      {/* Footer Minimalista */}
-      <footer className="border-t border-white/5 bg-[#050505] py-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-indigo-500" />
-            <span className="font-bold tracking-tight text-white">SmartHome<span className="text-indigo-500">CL</span></span>
-          </div>
-          <p className="text-neutral-500 text-sm">
-            &copy; {new Date().getFullYear()} Smart Home Chile. Todos los derechos reservados.
-          </p>
-          <div className="flex gap-4 text-sm text-neutral-500">
-            <a href="#" className="hover:text-white transition-colors">Privacidad</a>
-            <a href="#" className="hover:text-white transition-colors">Términos</a>
-            <a href="#" className="hover:text-white transition-colors">Contacto</a>
-          </div>
-        </div>
-      </footer>
-
       {/* Estilos CSS globales para animaciones sutiles (se pueden inyectar acá o en globals.css) */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes gradient-x {
